@@ -1,6 +1,12 @@
+import base64
 import streamlit as st
 from datetime import datetime
 import pandas as pd
+
+def get_image_url(img_path):
+    """Converts image to Base64 encoding"""
+    with open(img_path, "rb") as img_file:
+        return "data:image/jpg;base64," + base64.b64encode(img_file.read()).decode()
 
 def main():
     # Configure page settings
@@ -10,38 +16,45 @@ def main():
         layout="wide"
     )
 
+    # Load the background image as a Base64 string
+    bg_image_url = get_image_url('./assets/1.jpg')  # Make sure the path is correct
+
     # Custom CSS to style the app with background image
-    st.markdown("""
+    st.markdown(f"""
         <style>
-        .main {
-            background-image: url('./assets/bg.jpg');
+        .main {{
+            background-image: url("{bg_image_url}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             height: 100vh;
             color: white;  /* Set text color to white for better contrast */
-        }
-        .stButton>button {
+        }}
+        .stButton>button {{
             background-color: #10b981;
             color: white;
             border-radius: 20px;
             padding: 10px 30px;
             border: none;
             width: 100%;
-        }
-        .stButton>button:hover {
+        }}
+        .stButton>button:hover {{
             background-color: #059669;
-        }
-        div[data-testid="stRadio"] > div {
+        }}
+        div[data-testid="stRadio"] > div {{
             display: flex;
             gap: 1rem;
             padding: 10px;
-        }
-        div[data-testid="stRadio"] > div:first-child {
+        }}
+        div[data-testid="stRadio"] > div:first-child {{
             background-color: #ffedd5;
             border-radius: 10px;
             padding: 20px;
-        }
+        }}
+        /* Ensuring the layout adjusts properly */
+        .stApp {{
+            height: 100%;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -111,7 +124,7 @@ def main():
 
     # Check if form has been submitted
     if submit_button:
-        # Check if all fields are filled and show error message if not
+        # Validate user inputs (age, height, weight, etc.)
         if gender == "Select Gender":
             st.error("Please select your gender.")
         elif age == "Select Age":
@@ -127,23 +140,21 @@ def main():
         elif objective == "Select Objective":
             st.error("Please select your objective.")
         else:
-            # Convert height and weight to integers after validation
+            # Proceed with the calculations and show the personalized plan
             height = int(height)
             weight = int(weight)
-
-            # If all fields are filled, proceed with the calculations and display the plan
 
             # Calculate BMI
             bmi = weight / ((height / 100) ** 2)
 
-            # Calculate basic calorie needs (using Harris-Benedict equation)
+            # Basic calorie calculation (Harris-Benedict)
             is_male = gender == "👨 Male"
             if is_male:
                 bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
             else:
                 bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
 
-            # Activity multipliers
+            # Activity multiplier
             activity_multipliers = {
                 "Sedentary": 1.2,
                 "Lightly Active": 1.375,
@@ -153,7 +164,7 @@ def main():
 
             daily_calories = bmr * activity_multipliers[activity_level]
 
-            # Adjust calories based on objective
+            # Adjust for the objective
             if objective == "Weight Loss":
                 target_calories = daily_calories - 500
             elif objective in ["Weight Gain", "Muscle Gain"]:
@@ -161,7 +172,7 @@ def main():
             else:
                 target_calories = daily_calories
 
-            # Calculate macronutrient distribution
+            # Macronutrient breakdown
             protein_cals = target_calories * 0.3
             carb_cals = target_calories * 0.4
             fat_cals = target_calories * 0.3
@@ -170,7 +181,7 @@ def main():
             carb_g = carb_cals / 4
             fat_g = fat_cals / 9
 
-            # Display the personalized plan
+            # Show results
             st.success("Your personalized plan has been created!")
 
             col1, col2 = st.columns(2)
@@ -194,8 +205,7 @@ def main():
                     - 30 days of meal and exercise scheduling
                     - Progress tracking tools
                 """)
-
-                # Add a payment button (placeholder)
+                # Placeholder for payment button
                 st.markdown("### Complete Your Purchase")
                 if st.button("Pay ₹499"):
                     st.success("Payment button clicked! (Payment integration would go here)")
