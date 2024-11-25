@@ -10,11 +10,16 @@ def main():
         layout="wide"
     )
 
-    # Custom CSS to style the app
+    # Custom CSS to style the app with background image
     st.markdown("""
         <style>
         .main {
-            background-color: #fff5eb;
+            background-image: url('./assets/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            color: white;  /* Set text color to white for better contrast */
         }
         .stButton>button {
             background-color: #10b981;
